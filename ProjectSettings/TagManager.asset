@@ -50,3 +50,6 @@ TagManager:
   - name: Platform_foreground
     uniqueID: 1478621361
     locked: 0
+  - name: Death
+    uniqueID: 1758254791
+    locked: 0
