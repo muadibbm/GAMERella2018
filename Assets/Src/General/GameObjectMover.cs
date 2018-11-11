@@ -7,7 +7,6 @@ public class GameObjectMover : MonoBehaviour {
     public Vector3 dir;
     public bool flipX;
     public bool flipY;
-    public bool loop;
 
     private SpriteRenderer rend;
 

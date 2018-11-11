@@ -18,11 +18,13 @@ public class PlayerController : MonoBehaviour {
     private Animator animator;
     private SpriteRenderer rend;
     private Vector3 prevPosition;
+    private bool ascending;
 
     private void Awake() {
         this.animator = this.GetComponentInChildren<Animator>();
         this.rend = this.GetComponentInChildren<SpriteRenderer>();
         this.currentState = State.Jump;
+        this.prevPosition = this.transform.position;
     }
 
     void Update () {
@@ -33,9 +35,7 @@ public class PlayerController : MonoBehaviour {
     private void FixedUpdate() {
         if (!this.frozen) this.UpdateLocomotion();
         this.CheckForNextState();
-    }
-
-    private void LateUpdate() {
+        this.ascending = this.transform.position.y >= this.prevPosition.y;
         this.prevPosition = this.transform.position;
     }
 
@@ -109,8 +109,8 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void DoJump() {
-        bool ascending = this.transform.position.y > this.prevPosition.y;
-        this.SetAnimations(false, ascending, !ascending);
+        Debug.Log(ascending);
+        this.SetAnimations(false, this.ascending, !this.ascending);
     }
 
     private void SetAnimations(bool walk, bool jumpAscend, bool jumpDescend) {
