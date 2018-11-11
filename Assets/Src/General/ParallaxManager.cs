@@ -1,9 +1,10 @@
 ﻿using UnityEngine;
 
-[RequireComponent(typeof(Camera))]
 public class ParallaxManager : MonoBehaviour {
 
     public float backgroundSize; // the horizontal extent of what the camera can see
+    public Camera targetCamera;
+    public Trigger trigger;
 
     [System.Serializable]
     public class Layer {
@@ -24,20 +25,23 @@ public class ParallaxManager : MonoBehaviour {
 
     private float prevPosX;
 
+    private void Awake() {
+        this.trigger.OnStay2D += this.UpdateLayers;
+    }
+
     private void Start() {
         for (int i = 0; i < this.layers.Length; i++) {
             this.layers[i].currentLast = this.layers[i].elements.Length - 1;
         }
-        this.prevPosX = this.transform.position.x;
+        this.prevPosX = this.targetCamera.transform.position.x;
     }
 
-    private void Update() {
-        //this.transform.Translate(Vector3.right * Time.deltaTime * 10f);
-        if (this.transform.position.x != this.prevPosX) {
+    private void UpdateLayers(Collider2D other) {
+        if (this.targetCamera.transform.position.x != this.prevPosX) {
             this.SlideLayers();
             this.LoopLayers();
         }
-        this.prevPosX = this.transform.position.x;
+        this.prevPosX = this.targetCamera.transform.position.x;
     }
 
     private void SlideLayers() {
@@ -46,7 +50,7 @@ public class ParallaxManager : MonoBehaviour {
             for (int j = 0; j < this.layers[i].elements.Length; j++) {
                 if (this.layers[i].slide) {
                     pos = this.layers[i].elements[j].position;
-                    pos.x += (this.prevPosX - this.transform.position.x) * this.layers[i].speed;
+                    pos.x += (this.prevPosX - this.targetCamera.transform.position.x) * this.layers[i].speed;
                     this.layers[i].elements[j].position = pos;
                 }
             }
@@ -59,12 +63,12 @@ public class ParallaxManager : MonoBehaviour {
             if (this.layers[i].loop) {
                 currentFirstPos = this.layers[i].elements[this.layers[i].currentFirst].position;
                 currentLastPos = this.layers[i].elements[this.layers[i].currentLast].position;
-                if (Mathf.Abs(currentLastPos.x - this.transform.position.x) < this.backgroundSize) {
+                if (Mathf.Abs(currentLastPos.x - this.targetCamera.transform.position.x) < this.backgroundSize) {
                     this.layers[i].elements[this.layers[i].currentFirst].position = currentLastPos + Vector3.right * this.layers[i].offset;
                     this.layers[i].currentLast = this.layers[i].currentFirst;
                     this.layers[i].currentFirst++;
                     if (this.layers[i].currentFirst == this.layers[i].elements.Length) this.layers[i].currentFirst = 0;
-                } else if (Mathf.Abs(currentFirstPos.x - this.transform.position.x) < this.backgroundSize) {
+                } else if (Mathf.Abs(currentFirstPos.x - this.targetCamera.transform.position.x) < this.backgroundSize) {
                     this.layers[i].elements[this.layers[i].currentLast].position = currentFirstPos - Vector3.right * this.layers[i].offset;
                     this.layers[i].currentFirst = this.layers[i].currentLast;
                     this.layers[i].currentLast--;

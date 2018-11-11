@@ -109,7 +109,6 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void DoJump() {
-        Debug.Log(ascending);
         this.SetAnimations(false, this.ascending, !this.ascending);
     }
 
