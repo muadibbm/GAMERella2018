@@ -15,6 +15,15 @@ public class PlayerController : MonoBehaviour {
     private enum State { Idle, Walk, Jump }
     private State currentState;
     private bool frozen = false;
+    private Animator animator;
+    private SpriteRenderer rend;
+    private Vector3 prevPosition;
+
+    private void Awake() {
+        this.animator = this.GetComponentInChildren<Animator>();
+        this.rend = this.GetComponentInChildren<SpriteRenderer>();
+        this.currentState = State.Jump;
+    }
 
     void Update () {
         this.controller = Bootstrap.instance.gameInput.GetController();
@@ -23,6 +32,11 @@ public class PlayerController : MonoBehaviour {
 
     private void FixedUpdate() {
         if (!this.frozen) this.UpdateLocomotion();
+        this.CheckForNextState();
+    }
+
+    private void LateUpdate() {
+        this.prevPosition = this.transform.position;
     }
 
     public GameInput.Controller GetController() {
@@ -49,7 +63,6 @@ public class PlayerController : MonoBehaviour {
                 this.DoJump();
                 break;
         }
-        this.CheckForNextState();
     }
 
     private void CheckForNextState() {
@@ -75,6 +88,7 @@ public class PlayerController : MonoBehaviour {
     private void UpdateLocomotion() {
         Vector2 dir = this.controller.joy1;
         Vector3 motion = Vector3.right * dir.x * this.speed * Time.deltaTime;
+        if(dir.x != 0) this.rend.flipX = (dir.x < 0);
         if (this.currentState == State.Jump) {
             this.elsapsedTime += Time.deltaTime;
             if (this.elsapsedTime < this.jumpDuartion) {
@@ -87,15 +101,22 @@ public class PlayerController : MonoBehaviour {
     }
 
     private void DoIdle() {
-
+        this.SetAnimations(false, false, false);
     }
 
     private void DoWalk() {
-
+        this.SetAnimations(true, false, false);
     }
 
     private void DoJump() {
+        bool ascending = this.transform.position.y > this.prevPosition.y;
+        this.SetAnimations(false, ascending, !ascending);
+    }
 
+    private void SetAnimations(bool walk, bool jumpAscend, bool jumpDescend) {
+        this.animator.SetBool("walking", walk);
+        this.animator.SetBool("jumping_ascend", jumpAscend);
+        this.animator.SetBool("jumping_descend", jumpDescend);
     }
 
     private void OnDrawGizmos() {
