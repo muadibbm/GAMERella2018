@@ -87,12 +87,12 @@ public class PlayerController : MonoBehaviour {
 
     private void UpdateLocomotion() {
         Vector2 dir = this.controller.joy1;
-        Vector3 motion = Vector3.right * dir.x * this.speed * Time.deltaTime;
+        Vector3 motion = Vector3.right * dir.x * this.speed * Time.fixedDeltaTime;
         if(dir.x != 0) this.rend.flipX = (dir.x < 0);
         if (this.currentState == State.Jump) {
             this.elsapsedTime += Time.deltaTime;
             if (this.elsapsedTime < this.jumpDuartion) {
-                motion += Vector3.up * this.jumpSpeed * Time.deltaTime;
+                motion += Vector3.up * this.jumpSpeed * Time.fixedDeltaTime;
             }
         } else {
             this.elsapsedTime = 0f;

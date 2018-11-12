@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 
+[RequireComponent(typeof(Collider2D))]
 public class ParallaxManager : MonoBehaviour {
 
     public float backgroundSize; // the horizontal extent of what the camera can see
     public Camera targetCamera;
-    public Trigger trigger;
 
     [System.Serializable]
     public class Layer {
@@ -24,19 +24,29 @@ public class ParallaxManager : MonoBehaviour {
     public Layer[] layers = new Layer[1];
 
     private float prevPosX;
+    private bool playerInTrigger;
 
     private void Awake() {
-        this.trigger.OnStay2D += this.UpdateLayers;
+        this.targetCamera = Camera.main;
     }
 
     private void Start() {
         for (int i = 0; i < this.layers.Length; i++) {
             this.layers[i].currentLast = this.layers[i].elements.Length - 1;
         }
-        this.prevPosX = this.targetCamera.transform.position.x;
     }
 
-    private void UpdateLayers(Collider2D other) {
+    private void OnTriggerEnter2D(Collider2D other) {
+        this.prevPosX = this.targetCamera.transform.position.x;
+        this.playerInTrigger = true;
+    }
+
+    private void OnTriggerExit2D(Collider2D other) {
+        this.playerInTrigger = false;
+    }
+
+    private void Update() {
+        if (this.playerInTrigger == false) return;
         if (this.targetCamera.transform.position.x != this.prevPosX) {
             this.SlideLayers();
             this.LoopLayers();

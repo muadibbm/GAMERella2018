@@ -18,4 +18,10 @@ public class Bootstrap : MonoBehaviour {
     void Update() {
         this.gameInput.Update();
     }
+
+    private void OnDestroy() {
+        if (instance == this) {
+            PersistentReset.Reset();
+        }
+    }
 }
